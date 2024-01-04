@@ -2,7 +2,7 @@ import json
 import os
 import requests
 
-def lambda_handler(event, context):
+def handler(event, context):
     request_body = json.loads(event['body']) # EXtract the Body from the call
     request_msg = json.dumps(request_body['message'])#['chat']['id'] # Extract the message object which contrains chat id and text
     chat_id = json.dumps(request_body['message']['chat']['id']) # Extract the chat id from message
