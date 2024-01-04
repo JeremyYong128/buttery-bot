@@ -15,9 +15,23 @@ def handler(event, context):
     command = command[1:] # Valid input command is /start or /help. however stripping the '/' here as it was having some conflict in execution.
     
     if command == 'start':
-        message = "Welcome to my bot! How can I help you today?" # Sample Response on start command
+        message = "Welcome to my bot! How can I help you today?"
+        # Create the custom keyboard
+        keyboard = {
+            'inline_keyboard': [
+                [
+                    {'text': 'Bookings', 'callback_data': 'option1'},
+                    {'text': 'Check status', 'callback_data': 'option2'}
+                ]
+            ]
+        }
+        # Convert the keyboard to JSON
+        reply_markup = json.dumps(keyboard)
+        
     elif command == 'help':
         message = "Here are the available commands: /start, /help"
+    elif command == 'nigga':
+        message = "burh u cant say that lil nigga"
     else:
         message = "I'm sorry, I didn't understand that command. Please try again."
 
