@@ -14,5 +14,5 @@ def handler(event, context):
     print(response)    
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps('Hello from Lambda1!')
     }
