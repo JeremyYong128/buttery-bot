@@ -14,9 +14,9 @@ package:
 
 functions:
   theLambda:
-    name: test-lambda
+    name: buttery-bot
     handler: lambda.handler
-    description: test-lambda
+    description: Saga Buttery Bot
     timeout: 5 # seconds
     memorySize: 128 # mb
     package:
