@@ -15,7 +15,7 @@ def handler(event, context):
     command = command[1:] # Valid input command is /start or /help. however stripping the '/' here as it was having some conflict in execution.
     
     if command == 'start':
-        message = "Welcome to my bot! How can I help you today?"
+        message = "Welcome to ButteryBot! What would you like to do?"
         # Create the custom keyboard
         keyboard = {
             'inline_keyboard': [
@@ -27,6 +27,11 @@ def handler(event, context):
         }
         # Convert the keyboard to JSON
         reply_markup = json.dumps(keyboard)
+
+        send_text = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={BOT_CHAT_ID}&parse_mode=HTML&text={message}&reply_markup={reply_markup}'
+        response = requests.get(send_text)
+        print(send_text)
+        print(response)
         
     elif command == 'help':
         message = "Here are the available commands: /start, /help"
