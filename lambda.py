@@ -1,6 +1,9 @@
 import json
 import os
 import requests
+import psycopg2
+import urllib.parse as up
+from psycopg2 import Error
 
 def handler(event, context):
     request_body = json.loads(event['body']) # EXtract the Body from the call
@@ -10,7 +13,6 @@ def handler(event, context):
 
     # TODO implement
     BOT_TOKEN = os.environ.get('TOKEN')
-    BOT_CHAT_ID = os.environ.get('CHATID')
     BOT_CHAT_ID = chat_id # Updating the Bot Chat Id to be dynamic instead of static one earlier
     command = command[1:] # Valid input command is /start or /help. however stripping the '/' here as it was having some conflict in execution.
     
@@ -66,7 +68,13 @@ def handler(event, context):
     elif command == 'help':
         message = "Here are the available commands: /start, /help"
     elif command == 'nigga':
-        message = "burh u cant say that lil nigga"
+        try: 
+            up.uses_netloc.append("postgres")
+            url = up.urlparse(os.environ["DATABASE_URL"])
+            conn = psycopg2.connect(database=url.path[1:], user=url.username, password=url.password, host=url.hostname, port=url.port)
+            message = "database connected nigga"
+        except Error as e:
+            message = f"Database error nigga: {e}"
     else:
         message = "I'm sorry, I didn't understand that command. Please try again."
 
