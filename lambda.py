@@ -80,7 +80,7 @@ def handler(event, context):
 
     send_text = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + BOT_CHAT_ID + '\&parse_mode=HTML&text=' + message
     response = requests.get(send_text)
-    print(send_text) 
+    print(send_text)
     print(response) 
     
     return {
