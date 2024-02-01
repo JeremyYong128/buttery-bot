@@ -1,7 +1,7 @@
 import os
 import urllib.parse as up
 from psycopg2 import pool
-from models import Booking
+from models.Booking import Booking
 
 connection_pool = None
 
@@ -32,4 +32,4 @@ def get_bookings():
         cursor.execute("SELECT * FROM bookings")
         bookings = cursor.fetchall()
     release_connection(conn)
-    return map(lambda booking: Booking(*booking), bookings)
+    return list(map(lambda booking: Booking(*booking), bookings))

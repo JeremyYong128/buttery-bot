@@ -1,7 +1,6 @@
 import json
 import messages
 import database
-import message_builder
 from message_builder import Message
 from functools import reduce
 
