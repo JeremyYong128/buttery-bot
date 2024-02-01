@@ -14,7 +14,7 @@ class Booking:
         self.date = date
         self.start_time = start_time
         self.duration = duration
-        self.end_time = calculate_end_time(start_time, duration)
+        self.end_time = self.calculate_end_time(start_time, duration)
 
     def __str__(self):
         date_str = self.date.strftime(Booking.date_format_string)
