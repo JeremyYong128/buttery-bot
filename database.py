@@ -1,8 +1,7 @@
 import os
-import psycopg2
 import urllib.parse as up
-from psycopg2 import Error
 from psycopg2 import pool
+from models import Booking
 
 connection_pool = None
 
@@ -26,13 +25,11 @@ def get_connection():
 def release_connection(conn):
     connection_pool.putconn(conn)
 
-def get_bookings(conn):
-    rows = None
+def get_bookings():
+    conn = get_connection()
+    bookings = None
     with conn.cursor() as cursor:
         cursor.execute("SELECT * FROM bookings")
-        rows = cursor.fetchall()
-    return rows
-    
-def add_booking(telegram, date, start_time, duration):
-    conn = get_connection()
-
+        bookings = cursor.fetchall()
+    release_connection(conn)
+    return map(lambda booking: Booking(*booking), bookings)

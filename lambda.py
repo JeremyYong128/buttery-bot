@@ -3,6 +3,7 @@ import messages
 import database
 import message_builder
 from message_builder import Message
+from functools import reduce
 
 def handler(event, context):
     print(event)
@@ -17,14 +18,14 @@ def handler(event, context):
         Message().with_chat_id(chat_id).with_text(messages.HELP_MESSAGE + "\n\n" + messages.CONTACT_MESSAGE).send()
     
     elif command == '/bookings':
-        conn = database.get_connection()
-        rows = database.query(conn)
-        database.release_connection(conn)
+        bookings = database.get_bookings()
         
-        if len(rows) == 0:
+        if len(bookings) == 0:
             Message().with_chat_id(chat_id).with_text(messages.NO_BOOKINGS_MESSAGE).send()
-        for row in rows:
-            Message().with_chat_id(chat_id).with_text(str(row)).send()
+        else:
+            initial_str = "Here are the current bookings:\n\n"
+            final_str = reduce(lambda acc, next: acc + "\n" + str(next), bookings, initial_str)
+            Message().with_chat_id(chat_id).with_text(final_str).send()
 
     else:
         Message().with_chat_id(chat_id).with_text(messages.UNKNOWN_COMMAND_MESSAGE).send()
