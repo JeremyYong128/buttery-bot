@@ -1,36 +1,34 @@
 import json
-import os
-import requests
 import messages
 import database
-
-
-BOT_TOKEN = os.environ.get('TOKEN')
+import message_builder
+from message_builder import Message
 
 def handler(event, context):
     print(event)
     request_body = json.loads(event['body']) # Extract the Body from the call
-    BOT_CHAT_ID = json.dumps(request_body['message']['chat']['id']) # Extract the chat id from message
+    chat_id = json.dumps(request_body['message']['chat']['id']) # Extract the chat id from message
     command = json.dumps(request_body['message']['text']).strip('"') # Extract the text from the message
   
     if command == '/start':
-        send_message(BOT_TOKEN, BOT_CHAT_ID, messages.WELCOME_MESSAGE + "\n\n" + messages.HELP_MESSAGE)
+        Message().with_chat_id(chat_id).with_text(messages.WELCOME_MESSAGE + "\n\n" + messages.HELP_MESSAGE).send()
         
     elif command == '/help':
-        send_message(BOT_TOKEN, BOT_CHAT_ID, messages.HELP_MESSAGE + "\n\n" + messages.CONTACT_MESSAGE)
+        Message().with_chat_id(chat_id).with_text(messages.HELP_MESSAGE + "\n\n" + messages.CONTACT_MESSAGE).send()
     
-    elif command == '/testdb':
+    elif command == '/bookings':
         conn = database.get_connection()
         rows = database.query(conn)
+        database.release_connection(conn)
+        
+        if len(rows) == 0:
+            Message().with_chat_id(chat_id).with_text(messages.NO_BOOKINGS_MESSAGE).send()
         for row in rows:
-            send_message(BOT_TOKEN, BOT_CHAT_ID, row)
+            Message().with_chat_id(chat_id).with_text(str(row)).send()
 
     else:
-        send_message(BOT_TOKEN, BOT_CHAT_ID, "I'm sorry, I didn't understand that. Please try again.")
+        Message().with_chat_id(chat_id).with_text(messages.UNKNOWN_COMMAND_MESSAGE).send()
     
     return {
         'statusCode': 200
     }
-    
-def send_message(bot_token, chat_id, message):
-    requests.get('https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + chat_id + '\&parse_mode=HTML&text=' + message)
