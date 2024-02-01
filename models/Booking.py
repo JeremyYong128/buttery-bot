@@ -7,7 +7,7 @@ class Booking:
     date_format_string = "%a, %-d %b"
 
     def calculate_end_time(self, start_time, duration):
-        return (datetime.combine(date.today(), start_time) + timedelta(duration)).time()
+        return (datetime.combine(date.today(), start_time) + timedelta(hours=duration)).time()
         
     def __init__(self, telegram_handle, date, start_time, duration):
         self.telegram_handle = telegram_handle
@@ -22,5 +22,3 @@ class Booking:
         end_time_str = self.end_time.strftime(Booking.time_format_string)
 
         return date_str + ": " + start_time_str + " to " + end_time_str
-
-    

@@ -2,6 +2,7 @@ import os
 import urllib.parse as up
 from psycopg2 import pool
 from models.Booking import Booking
+from datetime import date
 
 connection_pool = None
 
@@ -26,10 +27,15 @@ def release_connection(conn):
     connection_pool.putconn(conn)
 
 def get_bookings():
-    conn = get_connection()
     bookings = None
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM bookings")
-        bookings = cursor.fetchall()
-    release_connection(conn)
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM bookings")
+            bookings = cursor.fetchall()
     return list(map(lambda booking: Booking(*booking), bookings))
+
+def update():
+    date_string = date.today().strftime("%Y-%m-%d")
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM bookings WHERE date < ", (date_string,))
