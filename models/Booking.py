@@ -17,4 +17,4 @@ class Booking:
         start_time_str = self.strftime(Booking.time_format_string)
         end_time_str = self.strftime(Booking.time_format_string)
 
-        return date_str + ": " + start_time_str " to " + end_time_str
+        return date_str + ": " + start_time_str + " to " + end_time_str
