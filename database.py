@@ -26,12 +26,11 @@ def get_connection():
 def release_connection(conn):
     connection_pool.putconn(conn)
 
-def query(conn):
+def get_bookings(conn):
     rows = None
     with conn.cursor() as cursor:
         cursor.execute("SELECT * FROM bookings")
         rows = cursor.fetchall()
-    release_connection(conn)
     return rows
     
 def add_booking(telegram, date, start_time, duration):
