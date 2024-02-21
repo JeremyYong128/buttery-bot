@@ -10,7 +10,7 @@ NO_BOOKINGS_MESSAGE = "There are no bookings."
 def send(chat_id, text, markup=None):
     request_string = REQUEST_STRING + 'sendMessage?chat_id=' + chat_id + '&text=' + text
     if markup:
-        request_string += '&reply_markup=' + self.markup
+        request_string += '&reply_markup=' + markup
     requests.get(request_string)
 
 def send_start(chat_id):
