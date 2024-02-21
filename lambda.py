@@ -5,11 +5,22 @@ import utils
 from functools import reduce
 
 def handler(event, context):
-    request_body = json.loads(event['body']) # Extract the Body from the call
-    chat_id = json.dumps(request_body['message']['chat']['id']) # Extract the chat id from message
-    command = json.dumps(request_body['message']['text']).strip('"') # Extract the text from the message
-
+    update = json.loads(event['body'])
     database.update()
+
+    if 'message' in update:
+        handle_message(update)
+
+    if 'callback' in update:
+        handle_callback(update)
+    
+    return {
+        'statusCode': 200
+    }
+
+def handle_message(update):
+    chat_id = json.dumps(update['message']['chat']['id'])
+    command = json.dumps(update['message']['text']).strip('"')
   
     if command == '/start':
         message.send_start(chat_id)
@@ -34,7 +45,9 @@ def handler(event, context):
             
     else:
         message.send_unknown_command(chat_id)
-    
-    return {
-        'statusCode': 200
-    }
+
+def handle_callback(update):
+    chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
+    data = json.dumps(update['callback_query']['data'])
+
+    message.send(chat_id, "Data is " + data)
