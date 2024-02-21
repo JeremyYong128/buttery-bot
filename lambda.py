@@ -27,8 +27,7 @@ def handler(event, context):
             final_str = reduce(lambda acc, next: acc + "\n" + str(next), bookings, initial_str)
             Message().with_chat_id(chat_id).with_text(final_str).send()
 
-    elif command == '/book':
-        keyboard_markup = utils.generate_keyboard_markup()
+    # elif command == '/book':
             
     else:
         Message().with_chat_id(chat_id).with_text(utils.UNKNOWN_COMMAND_MESSAGE).send()
