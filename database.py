@@ -28,14 +28,16 @@ def release_connection(conn):
 
 def get_bookings():
     bookings = None
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM bookings")
-            bookings = cursor.fetchall()
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM bookings")
+        bookings = cursor.fetchall()
+    release_connection(conn)
     return list(map(lambda booking: Booking(*booking), bookings))
 
 def update():
     date_string = date.today().strftime("%Y-%m-%d")
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM bookings WHERE date < ", (date_string,))
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("DELETE FROM bookings WHERE date < '" + date_string + "'")
+    release_connection(conn)
