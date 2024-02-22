@@ -9,11 +9,12 @@ class Booking:
     def calculate_end_time(self, start_time, duration):
         return (datetime.combine(date.today(), start_time) + timedelta(hours=duration)).time()
         
-    def __init__(self, telegram_handle, date, start_time, duration):
+    def __init__(self, telegram_handle, date, start_time, duration, approved):
         self.telegram_handle = telegram_handle
         self.date = date
         self.start_time = start_time
         self.duration = duration
+        self.approved = approved
         self.end_time = self.calculate_end_time(start_time, duration)
 
     def __str__(self):

@@ -2,6 +2,7 @@ import json
 import message
 import database
 import utils
+import datetime
 from functools import reduce
 
 def handler(event, context):
@@ -11,7 +12,7 @@ def handler(event, context):
     if 'message' in update:
         handle_message(update)
 
-    if 'callback' in update:
+    if 'callback_query' in update:
         handle_callback(update)
     
     return {
@@ -29,7 +30,7 @@ def handle_message(update):
         message.send_help(chat_id)
     
     elif command == '/bookings':
-        bookings = database.get_bookings()
+        bookings = database.get_approved_bookings()
         
         if len(bookings) == 0:
             message.send_no_bookings(chat_id)
@@ -40,14 +41,16 @@ def handle_message(update):
 
     elif command == '/book':
         msg_str = "Choose the day of your booking:"
-        keyboard_markup = utils.generate_keyboard_markup()
+        keyboard_markup = utils.generate_dates_keyboard_markup()
         message.send(chat_id, msg_str, keyboard_markup)
+
+    elif command == '/test':
+        database.create_request('@bobbymcbobface', datetime.date.today())
             
     else:
         message.send_unknown_command(chat_id)
 
 def handle_callback(update):
     chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
-    data = json.dumps(update['callback_query']['data'])
-
-    message.send(chat_id, "Data is " + data)
+    handle = json.dumps(update['callback_query']['message']['from']['username'])
+    date = datetime.datetime.today() + datetime.timedelta(days=int(json.dumps(update['callback_query']['data'])))

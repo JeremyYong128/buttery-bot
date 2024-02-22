@@ -4,7 +4,7 @@ import json
 
 REQUEST_STRING = 'https://api.telegram.org/bot' + os.environ.get('TOKEN') + '/'
 
-def generate_keyboard_markup():
+def generate_dates_keyboard_markup():
     keyboard = [[ generate_keyboard_date_button(i, j) for j in range(2)] for i in range(4)]
     return json.dumps({
         "inline_keyboard": keyboard

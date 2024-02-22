@@ -26,11 +26,11 @@ def get_connection():
 def release_connection(conn):
     connection_pool.putconn(conn)
 
-def get_bookings():
+def get_approved_bookings():
     bookings = None
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM bookings")
+        cursor.execute("select * from bookings where approved = true")
         bookings = cursor.fetchall()
     release_connection(conn)
     return list(map(lambda booking: Booking(*booking), bookings))
@@ -39,5 +39,13 @@ def update():
     date_string = date.today().strftime("%Y-%m-%d")
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("DELETE FROM bookings WHERE date < '" + date_string + "'")
+        cursor.execute("delete from bookings where date < '" + date_string + "'")
     release_connection(conn)
+
+def create_request(telegram_handle, date):
+    date_string = date.strftime("%Y-%m-%d")
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
+    release_connection(conn)
+
