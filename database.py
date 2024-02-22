@@ -3,6 +3,7 @@ import urllib.parse as up
 from psycopg2 import pool
 from models.Booking import Booking
 from datetime import date
+from psycopg2.errors import UniqueViolation
 
 connection_pool = None
 
@@ -45,9 +46,24 @@ def update():
         cursor.execute("delete from bookings where date < '" + date_string + "'")
     release_connection(conn)
 
-def create_request(telegram_handle, date):
+def update_request_date(telegram_handle, date):
     date_string = date.strftime("%Y-%m-%d")
+    action = None
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
+        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and date = '" + date_string + "'")
+        booking_params = cursor.fetchone()
+
+        if booking_params:
+            current_booking = Booking(*booking_params)
+            if current_booking.duration is None:
+                cursor.execute("update bookings set date = '" + date_string + "' where telegram_handle = '" + telegram_handle + "'")
+                action = "update"
+            else:
+                action = "none"
+        else:
+            cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
+            action = "insert"
+            
     release_connection(conn)
+    return action

@@ -45,7 +45,7 @@ def handle_message(update):
         message.send(chat_id, msg_str, keyboard_markup)
 
     elif command == '/test':
-        database.create_request('@bobbymcbobface', datetime.date.today())
+        database.update_request_date('@bobbymcbobface', datetime.date.today())
             
     else:
         message.send_unknown_command(chat_id)
@@ -54,3 +54,6 @@ def handle_callback(update):
     chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
     handle = json.dumps(update['callback_query']['message']['from']['username'])
     date = datetime.datetime.today() + datetime.timedelta(days=int(json.dumps(update['callback_query']['data'])))
+    outcome = database.update_request_date(handle, date)
+    
+    message.send(chat_id, outcome)
