@@ -52,8 +52,11 @@ def handle_message(update):
 
 def handle_callback(update):
     chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
-    handle = json.dumps(update['callback_query']['message']['from']['username'])
-    date = datetime.datetime.today() + datetime.timedelta(days=int(json.dumps(update['callback_query']['data'])))
+    handle = json.dumps(update['callback_query']['from']['username']).strip('"')
+    date = datetime.datetime.today() + datetime.timedelta(days=int(json.dumps(update['callback_query']['data']).strip('"')))
     outcome = database.update_request_date(handle, date)
     
-    message.send(chat_id, outcome)
+    if outcome in ("insert", "update"):
+        message.send_set_booking_date(chat_id, date)
+    else:
+        message.send(chat_id, "Fuck u")

@@ -51,7 +51,7 @@ def update_request_date(telegram_handle, date):
     action = None
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and date = '" + date_string + "'")
+        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "'")
         booking_params = cursor.fetchone()
 
         if booking_params:

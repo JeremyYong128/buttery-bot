@@ -15,7 +15,7 @@ class Booking:
         self.start_time = start_time
         self.duration = duration
         self.approved = approved
-        self.end_time = self.calculate_end_time(start_time, duration)
+        self.end_time = self.calculate_end_time(start_time, duration) if start_time and duration else None
 
     def __str__(self):
         date_str = self.date.strftime(Booking.date_format_string)
