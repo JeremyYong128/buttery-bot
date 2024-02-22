@@ -21,7 +21,10 @@ def get_connection():
             host=url.hostname,
             port=url.port)
 
-    return connection_pool.getconn()
+    conn = connection_pool.getconn()
+    conn.autocommit = True
+
+    return conn
 
 def release_connection(conn):
     connection_pool.putconn(conn)
@@ -48,4 +51,3 @@ def create_request(telegram_handle, date):
     with conn.cursor() as cursor:
         cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
     release_connection(conn)
-
