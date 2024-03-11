@@ -34,7 +34,7 @@ def get_approved_bookings():
     bookings = None
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where approved = true")
+        cursor.execute("select * from bookings where approved = false") ### remember to change to true
         bookings = cursor.fetchall()
     release_connection(conn)
     return list(map(lambda booking: Booking(*booking), bookings))
@@ -46,24 +46,79 @@ def update():
         cursor.execute("delete from bookings where date < '" + date_string + "'")
     release_connection(conn)
 
-def update_request_date(telegram_handle, date):
-    date_string = date.strftime("%Y-%m-%d")
-    action = None
+def get_user_status(telegram_handle):
+    if has_previous_booking(telegram_handle):
+        return "has previous booking"
+    elif is_setting_time(telegram_handle):
+        return "setting time"
+    elif is_setting_duration(telegram_handle):
+        return "setting duration"
+    else:
+        return "no booking"
+
+def has_previous_booking(telegram_handle):
+    prev_booking = None
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and duration is not null")
+        prev_booking = cursor.fetchone()
+    release_connection(conn)
+
+    if prev_booking:
+        return True
+    return False
+
+def get_user_information(telegram_handle):
+    booking = None
     conn = get_connection()
     with conn.cursor() as cursor:
         cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "'")
-        booking_params = cursor.fetchone()
-
-        if booking_params:
-            current_booking = Booking(*booking_params)
-            if current_booking.duration is None:
-                cursor.execute("update bookings set date = '" + date_string + "' where telegram_handle = '" + telegram_handle + "'")
-                action = "update"
-            else:
-                action = "none"
-        else:
-            cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
-            action = "insert"
-            
+        booking = cursor.fetchone()
+    return booking
+    
+def is_setting_time(telegram_handle):
+    halfway_booking = None
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and start_time is null")
+        halfway_booking = cursor.fetchone()
     release_connection(conn)
-    return action
+
+    if halfway_booking:
+        return True
+    return False
+
+def is_setting_duration(telegram_handle):
+    halfway_booking = None
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and start_time is not null and duration is null")
+        halfway_booking = cursor.fetchone()
+    release_connection(conn)
+
+    if halfway_booking:
+        return True
+    return False
+
+def update_booking_date(telegram_handle, date, user_status):
+    date_string = date.strftime("%Y-%m-%d")
+
+    if user_status == "setting time" or user_status == "setting duration":
+        conn = get_connection()
+        with conn.cursor() as cursor:
+            if user_status == "setting duration":
+                cursor.execute("update bookings set start_time = NULL where telegram_handle = '" + telegram_handle + "'")
+            cursor.execute("update bookings set date = '" + date_string + "' where telegram_handle = '" + telegram_handle + "'")
+        release_connection(conn)
+    else:
+        conn = get_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("insert into bookings (telegram_handle, date) values ('" + telegram_handle + "', '" + date_string + "')")
+        release_connection(conn)
+
+def update_booking_time(telegram_handle, hour, min):
+    time_string = str(hour) + ":" + str(min) + ":00"
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("update bookings set start_time = '" + time_string + "' where telegram_handle = '" + telegram_handle + "'")
+    release_connection(conn)
