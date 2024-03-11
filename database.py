@@ -74,7 +74,7 @@ def get_user_information(telegram_handle):
     with conn.cursor() as cursor:
         cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "'")
         booking = cursor.fetchone()
-    return booking
+    return Booking(*booking)
     
 def is_setting_time(telegram_handle):
     halfway_booking = None
@@ -121,4 +121,10 @@ def update_booking_time(telegram_handle, hour, min):
     conn = get_connection()
     with conn.cursor() as cursor:
         cursor.execute("update bookings set start_time = '" + time_string + "' where telegram_handle = '" + telegram_handle + "'")
+    release_connection(conn)
+
+def update_booking_duration(telegram_handle, duration):
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("update bookings set duration = " + str(duration) + " where telegram_handle = '" + telegram_handle + "'")
     release_connection(conn)

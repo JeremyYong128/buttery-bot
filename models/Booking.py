@@ -1,22 +1,28 @@
-from datetime import date, datetime, timedelta
+from datetime import date, time, datetime, timedelta
 
 class Booking:
     time_format_string = "%-I:%M %p"
     date_format_string = "%a, %-d %b"
+    max_duration = 2
+    acceptable_durations = [0.5 * i for i in range(1, int(max_duration / 0.5) + 1)]
+    open_time = time(8, 0)
+    close_time = time(0, 0)
     
     @staticmethod
     def is_valid_start_time(hour):
-        if hour > 7 and hour < 24:
+        time = time(hour, 0)
+        if Booking.open_time <= time:
             return True
         return False
     
     @staticmethod
-    def is_valid_end_time(hour, min):
-        if Booking.is_valid_start_time(hour) or (hour == 0 and min == 0):
+    def is_valid_end_time(time):
+        if Booking.open_time < time or time == Booking.close_time:
             return True
         return False
 
-    def calculate_end_time(self, start_time, duration):
+    @staticmethod
+    def calculate_end_time(start_time, duration):
         return (datetime.combine(date.today(), start_time) + timedelta(hours=duration)).time()
         
     def __init__(self, telegram_handle, date, start_time, duration, approved):
@@ -25,7 +31,7 @@ class Booking:
         self.start_time = start_time
         self.duration = duration
         self.approved = approved
-        self.end_time = self.calculate_end_time(start_time, duration) if start_time and duration else None
+        self.end_time = Booking.calculate_end_time(start_time, duration) if start_time and duration else None
 
     def __str__(self):
         date_str = self.date.strftime(Booking.date_format_string) if self.date else "NO DATE"

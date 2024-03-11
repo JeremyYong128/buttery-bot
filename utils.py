@@ -26,8 +26,8 @@ def is_valid_time_format(str):
         return False
     
     digits = str.strip().replace(':', '')
-    hour = int(str[:2])
-    min = int(str[2:])
+    hour = int(digits[:2])
+    min = int(digits[2:])
     
     if hour > 23 or (min not in (0, 30)):
         return False

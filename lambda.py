@@ -57,16 +57,25 @@ def handle_message(update):
                 if Booking.is_valid_start_time(hour):
                     database.update_booking_time(handle, hour, min)
                 else:
-                    message.send(chat_id, "The time provided is not valid. The start time of bookings has to be from 8am to 11:30pm.")
+                    message.send(chat_id, "Invalid time provided. The start time of bookings has to be from 8am to 11:30pm (0800 - 2330).")
         else:
-            message.send(chat_id, "Invalid time format, make sure it follows the 24h format and is on the hour/half hour (e.g. 23:00, 1430).")
+            message.send(chat_id, "Invalid time format. Make sure it follows the 24h format and is on the hour/half hour (e.g. 23:00, 1430).")
 
-    # elif user_status == "setting duration":
-        
-
-
+    elif user_status == "setting duration":
+        try:
+            duration = float(command)
+            if duration not in Booking.acceptable_durations:
+                message.send(chat_id, "Invalid duration provided. Duration must be a minimum of 0.5h and a maximum of 2h, and in intervals of 0.5h (i.e. values like 0.75 will not be accepted)")
+            else:
+                end_time = database.get_user_information(handle).end_time
+                if Booking.is_valid_end_time(end_time):
+                    database.update_booking_duration(handle, duration)
+                    message.send(chat_id, "The duration of your booking has been set to " + str(duration) + " hours.")
+                else:
+                    message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
                 
-
+        except ValueError:
+            message.send(chat_id, "Invalid duration format. Make sure it is a valid duration (e.g. 0.5, 1).")
     
     else:
         message.send_unknown_command(chat_id)
