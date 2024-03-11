@@ -1,4 +1,5 @@
-from datetime import date, time, datetime, timedelta
+from datetime import date, datetime, timedelta
+import time
 
 class Booking:
     time_format_string = "%-I:%M %p"
