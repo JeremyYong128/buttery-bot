@@ -74,7 +74,7 @@ def get_user_booking(telegram_handle):
     with conn.cursor() as cursor:
         cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "'")
         booking = cursor.fetchone()
-    return Booking(*booking)
+    return Booking(*booking) if booking else None
     
 def is_setting_time(telegram_handle):
     halfway_booking = None

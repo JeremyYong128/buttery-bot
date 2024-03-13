@@ -45,6 +45,15 @@ def handle_message(update):
     elif command == '/mybooking':
         booking = database.get_user_booking(handle)
 
+        if booking is None:
+            message.send(chat_id, "You have no bookings.")
+        elif booking.approved:
+            message.send(chat_id, "You have one approved booking:\n\n" + str(booking))
+        elif booking.duration:
+            message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking))
+        else:
+            message.send(chat_id, "You have one booking in progress:\n\n" + str(booking))
+
     elif command == '/book':
         if user_status == "has previous booking":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
