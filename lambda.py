@@ -38,9 +38,12 @@ def handle_message(update):
         if len(bookings) == 0:
             message.send(chat_id, "There are no bookings.")
         else:
-            initial_str = "Here are the current bookings:\n\n"
+            initial_str = "Here are all the current bookings:\n\n"
             final_str = reduce(lambda acc, next: acc + "\n" + str(next), bookings, initial_str)
             message.send(chat_id, final_str)
+    
+    elif command == '/mybooking':
+        booking = database.get_user_booking(handle)
 
     elif command == '/book':
         if user_status == "has previous booking":
@@ -56,7 +59,7 @@ def handle_message(update):
 
                 if Booking.is_valid_start_time(hour):
                     database.update_booking_time(handle, hour, min)
-                    message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + str(min) + ".\n\n" + 
+                    message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + (str(min) if min else "00") + ".\n\n" + 
                                  "Enter the duration of your booking. Note that bookings can be a maximum of 2h long, and must be in intervals of 0.5h.")
                 else:
                     message.send(chat_id, "Invalid time provided. The start time of bookings has to be from 8am to 11:30pm (0800 - 2330).")
@@ -69,11 +72,12 @@ def handle_message(update):
             if duration not in Booking.acceptable_durations:
                 message.send(chat_id, "Invalid duration provided. Duration must be a minimum of 0.5h and a maximum of 2h, and in intervals of 0.5h (i.e. values like 0.75 will not be accepted)")
             else:
-                end_time = database.get_user_information(handle).end_time
+                booking = database.get_user_booking(handle)
+                end_time = Booking.calculate_end_time(booking.start_time, duration)
                 if Booking.is_valid_end_time(end_time):
                     database.update_booking_duration(handle, duration)
                     message.send(chat_id, "The duration of your booking has been set to " + str(duration) + " hours.")
-                    booking = database.get_user_information(handle)
+                    booking = database.get_user_booking(handle)
                     message.send(chat_id, "Your booking has been made!\n\n" + str(booking))
                 else:
                     message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")

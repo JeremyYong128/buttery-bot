@@ -23,7 +23,7 @@ class Booking:
 
     @staticmethod
     def calculate_end_time(start_time, duration):
-        return (datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(hours=duration)).time()
+        return (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(hours=duration)).time()
         
     def __init__(self, telegram_handle, date, start_time, duration, approved):
         self.telegram_handle = telegram_handle

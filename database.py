@@ -34,7 +34,7 @@ def get_approved_bookings():
     bookings = None
     conn = get_connection()
     with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where approved = false") ### remember to change to true
+        cursor.execute("select * from bookings where approved = true")
         bookings = cursor.fetchall()
     release_connection(conn)
     return list(map(lambda booking: Booking(*booking), bookings))
@@ -68,7 +68,7 @@ def has_previous_booking(telegram_handle):
         return True
     return False
 
-def get_user_information(telegram_handle):
+def get_user_booking(telegram_handle):
     booking = None
     conn = get_connection()
     with conn.cursor() as cursor:
