@@ -58,7 +58,7 @@ def handle_message(update):
         booking = database.get_user_booking(handle)
 
         if booking is None:
-            message.send(chat_id, "You have no bookings. To create a booking, enter /book")
+            message.send(chat_id, "You have no bookings. To create a booking, use /book.")
         elif booking.get_status() == "approved":
             message.send(chat_id, "You have one approved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
         elif booking.get_status() == "unapproved":
@@ -112,9 +112,9 @@ def handle_message(update):
 
 def handle_callback(update):
     chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
-    handle = json.dumps(update['callback_query']['from']['username']).strip('"')
+    handle = update['callback_query']['from']['username']
     user_status = database.get_user_status(handle)
-    data = json.dumps(update['callback_query']['data']).strip('"')
+    data = update['callback_query']['data']
 
     if data == "Confirm":
         database.delete_booking(handle)
@@ -124,6 +124,6 @@ def handle_callback(update):
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
-            date = datetime.datetime.today() + datetime.timedelta(days=int(data))
+            date = datetime.date(data['year'], data['month'], data['day'])
             database.update_booking_date(handle, date, user_status)
             message.send_set_booking_date(chat_id, date)
