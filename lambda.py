@@ -70,9 +70,8 @@ def handle_message(update):
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
-            msg_str = "Choose the day of your booking:"
             keyboard_markup = utils.generate_dates_keyboard_markup()
-            message.send(chat_id, msg_str, keyboard_markup)
+            message.send(chat_id, "Choose the day of your booking:", keyboard_markup)
 
     elif user_status == "setting time":
         if utils.is_valid_time_format(command):
@@ -124,6 +123,7 @@ def handle_callback(update):
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
-            date = datetime.date(data['year'], data['month'], data['day'])
+            day, month, year = data.split(" ")
+            date = datetime.date(year, month, day)
             database.update_booking_date(handle, date, user_status)
             message.send_set_booking_date(chat_id, date)

@@ -11,18 +11,14 @@ def generate_dates_keyboard_markup():
 def generate_keyboard_date_button(row, col):
     value = 2 * row + col
     date = datetime.date.today() + datetime.timedelta(days=value)
-    day = date.day
-    month = date.month
-    year = date.year
-    date_string = format_booking_date(datetime.date.today() + datetime.timedelta(days=value))
+    day = str(date.day)
+    month = str(date.month)
+    year = str(date.year)
+    date_string = format_booking_date(date)
     
     return {
         "text": date_string,
-        "callback_data": {
-            "day": day,
-            "month": month,
-            "year": year
-        }
+        "callback_data": " ".join((day, month, year))
     }
 
 def yes_no_keyboard_markup():
