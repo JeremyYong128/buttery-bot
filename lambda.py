@@ -60,11 +60,11 @@ def handle_message(update):
         if booking is None:
             message.send(chat_id, "You have no bookings. To create a booking, enter /book")
         elif booking.get_status() == "approved":
-            message.send(chat_id, "You have one approved booking:\n\n" + str(booking) + "\n\nDo you want to delete this booking?", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one approved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
         elif booking.get_status() == "unapproved":
-            message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking) + "\n\nDo you want to delete this booking?", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
         else:
-            message.send(chat_id, "You have one booking in progress:\n\n" + str(booking) + "\n\nDo you want to delete this booking?", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one booking in progress:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
 
     elif command == '/book':
         if user_status == "approved" or user_status == "unapproved":
@@ -116,7 +116,7 @@ def handle_callback(update):
     user_status = database.get_user_status(handle)
     data = json.dumps(update['callback_query']['data']).strip('"')
 
-    if data == "Yes" or data == "No":
+    if data == "Confirm":
         database.delete_booking(handle)
         message.send(chat_id, "Your booking has been deleted.")
 

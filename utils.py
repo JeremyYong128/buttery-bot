@@ -20,11 +20,8 @@ def generate_keyboard_date_button(row, col):
 def yes_no_keyboard_markup():
     return json.dumps({
         "inline_keyboard": [[{
-            "text": "Yes",
-            "callback_data": "Yes"
-        }, {
-            "text": "No",
-            "callback_data": "No"
+            "text": "Confirm",
+            "callback_data": "Confirm"
         }]]
     })
 
