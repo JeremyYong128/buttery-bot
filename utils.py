@@ -17,6 +17,17 @@ def generate_keyboard_date_button(row, col):
         "callback_data": value
     }
 
+def yes_no_keyboard_markup():
+    return json.dumps({
+        "inline_keyboard": [[{
+            "text": "Yes",
+            "callback_data": "Yes"
+        }, {
+            "text": "No",
+            "callback_data": "No"
+        }]]
+    })
+
 def format_booking_date(date):
     return date.strftime("%-d %b")
 

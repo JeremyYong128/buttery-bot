@@ -47,26 +47,12 @@ def update():
     release_connection(conn)
 
 def get_user_status(telegram_handle):
-    if has_previous_booking(telegram_handle):
-        return "has previous booking"
-    elif is_setting_time(telegram_handle):
-        return "setting time"
-    elif is_setting_duration(telegram_handle):
-        return "setting duration"
-    else:
+    booking = get_user_booking(telegram_handle)
+
+    if booking is None:
         return "no booking"
-
-def has_previous_booking(telegram_handle):
-    prev_booking = None
-    conn = get_connection()
-    with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and duration is not null")
-        prev_booking = cursor.fetchone()
-    release_connection(conn)
-
-    if prev_booking:
-        return True
-    return False
+    else:
+        return booking.get_status()
 
 def get_user_booking(telegram_handle):
     booking = None
@@ -75,30 +61,6 @@ def get_user_booking(telegram_handle):
         cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "'")
         booking = cursor.fetchone()
     return Booking(*booking) if booking else None
-    
-def is_setting_time(telegram_handle):
-    halfway_booking = None
-    conn = get_connection()
-    with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and start_time is null")
-        halfway_booking = cursor.fetchone()
-    release_connection(conn)
-
-    if halfway_booking:
-        return True
-    return False
-
-def is_setting_duration(telegram_handle):
-    halfway_booking = None
-    conn = get_connection()
-    with conn.cursor() as cursor:
-        cursor.execute("select * from bookings where telegram_handle = '" + telegram_handle + "' and start_time is not null and duration is null")
-        halfway_booking = cursor.fetchone()
-    release_connection(conn)
-
-    if halfway_booking:
-        return True
-    return False
 
 def update_booking_date(telegram_handle, date, user_status):
     date_string = date.strftime("%Y-%m-%d")
@@ -127,4 +89,10 @@ def update_booking_duration(telegram_handle, duration):
     conn = get_connection()
     with conn.cursor() as cursor:
         cursor.execute("update bookings set duration = " + str(duration) + " where telegram_handle = '" + telegram_handle + "'")
+    release_connection(conn)
+
+def delete_booking(telegram_handle):
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("delete from bookings where telegram_handle = '" + telegram_handle + "'")
     release_connection(conn)

@@ -35,10 +35,17 @@ class Booking:
 
     def __str__(self):
         date_str = self.date.strftime(Booking.date_format_string) if self.date else "NO DATE"
-        start_time_str = self.start_time.strftime(Booking.time_format_string) if self.start_time else ""
+        start_time_str = self.start_time.strftime(Booking.time_format_string) if self.start_time else "time not set"
         end_time_str = (" to " + self.end_time.strftime(Booking.time_format_string)) if self.end_time else ""
 
         return date_str + ": " + start_time_str + end_time_str
     
-    def is_complete(self):
-        return self.duration is not None
+    def get_status(self):
+        if self.approved:
+            return "approved"
+        if self.duration is not None:
+            return "unapproved"
+        if self.start_time is None:
+            return "setting time"
+        if self.duration is None:
+            return "setting duration"
