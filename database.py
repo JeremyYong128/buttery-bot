@@ -63,6 +63,15 @@ def get_user_booking(telegram_handle):
     release_connection(conn)
     return Booking(*booking) if booking else None
 
+def get_booking_date(telegram_handle):
+    date = None
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("select date from bookings where telegram_handle = '" + telegram_handle + "'")
+        date = cursor.fetchone()
+    release_connection(conn)
+    return date
+
 def update_booking_date(telegram_handle, date, user_status):
     date_string = date.strftime("%Y-%m-%d")
 

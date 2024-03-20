@@ -3,14 +3,13 @@ import json
 import re
 
 def generate_dates_keyboard_markup():
-    keyboard = [[ generate_keyboard_date_button(i, j) for j in range(2)] for i in range(4)]
+    keyboard = [[ generate_keyboard_date_button(i)] for i in range(1, 4)]
     return json.dumps({
         "inline_keyboard": keyboard
     })
 
-def generate_keyboard_date_button(row, col):
-    value = 2 * row + col
-    date = datetime.date.today() + datetime.timedelta(days=value)
+def generate_keyboard_date_button(days):
+    date = datetime.date.today() + datetime.timedelta(days=days)
     day = str(date.day)
     month = str(date.month)
     year = str(date.year)

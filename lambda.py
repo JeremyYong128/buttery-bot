@@ -72,22 +72,30 @@ def handle_message(update):
     elif command == '/book':
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
+        
         else:
             keyboard_markup = utils.generate_dates_keyboard_markup()
             message.send(chat_id, "Choose the day of your booking:", keyboard_markup)
 
     elif user_status == "setting time":
-        if utils.is_valid_time_format(command):
-                hour, min = utils.parse_time_string(command)
-
-                if Booking.is_valid_start_time(hour):
-                    database.update_booking_time(handle, hour, min)
-                    message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + (str(min) if min else "00") + ".\n\n" + 
-                                 "Enter the duration of your booking. Note that bookings can be a maximum of 2h long, and must be in intervals of 0.5h.")
-                else:
-                    message.send(chat_id, "Invalid time provided. The start time of bookings has to be from 8am to 11:30pm (0800 - 2330).")
-        else:
+        if not utils.is_valid_time_format(command):
             message.send(chat_id, "Invalid time format. Make sure it follows the 24h format and is on the hour/half hour (e.g. 23:00, 1430).")
+            return
+
+        hour, min = utils.parse_time_string(command)
+
+        if not Booking.is_valid_start_time(hour):
+            message.send(chat_id, "Invalid time provided. The start time of bookings has to be from 8am to 11:30pm (0800 - 2330).")
+            return
+        
+        booking_date = database.get_booking_date(handle)
+
+        if not Booking.is_more_than_24h(booking_date, hour, min):
+            message.send(chat_id, "Invalid time provided. Bookings have to be made at least 24h in advance.")
+        
+        database.update_booking_time(handle, hour, min)
+        message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + (str(min) if min else "00") + ".\n\n" +
+                     "Enter the duration of your booking. Note that bookings can be a maximum of 2h long, and must be in intervals of 0.5h.")
 
     elif user_status == "setting duration":
         try:
