@@ -11,7 +11,7 @@ class Booking:
     @staticmethod
     def is_valid_start_time(hour):
         time = datetime.time(hour, 0)
-        if Booking.open_time <= time and date >= datetime.datetime.now() + datetime.timedelta(days=1):
+        if Booking.open_time <= time:
             return True
         return False
     
