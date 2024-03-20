@@ -21,12 +21,13 @@ def handler(event, context):
     }
 
 def handle_message(update):
-    chat_id = update['message']['chat']['id']
+    chat_id = str(update['message']['chat']['id'])
     command = update['message']['text']
     handle = update['message']['from']['username']
     user_status = database.get_user_status(handle)
 
     print(chat_id)
+    print(handle)
   
     if command == '/start':
         message.send_start(chat_id)
@@ -112,7 +113,7 @@ def handle_message(update):
 
 
 def handle_callback(update):
-    chat_id = update['callback_query']['message']['chat']['id']
+    chat_id = str(update['callback_query']['message']['chat']['id'])
     handle = update['callback_query']['from']['username']
     user_status = database.get_user_status(handle)
     data = update['callback_query']['data']

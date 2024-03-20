@@ -2,7 +2,13 @@ import os
 import requests
 from utils import format_booking_date
 
-HELP_MESSAGE = "- Type /bookings to view all bookings for the next 7 days.\n- Type /book to get started with booking the buttery."
+HELP_MESSAGE = """
+    - /book: get started with booking the buttery.\n
+    - /bookings: view all approved bookings for the next 7 days.\n
+    - /delete: delete your booking.\n
+    - /help: view all commands.\n
+    - /mybooking: view your current booking.\n
+    """
 PREVIOUS_BOOKING_MESSAGE = "You already have a previous booking. To add a new booking, cancel the previous one first."
 REQUEST_STRING = 'https://api.telegram.org/bot' + os.environ.get('TOKEN') + '/'
 
