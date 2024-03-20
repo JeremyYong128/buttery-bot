@@ -21,10 +21,12 @@ def handler(event, context):
     }
 
 def handle_message(update):
-    chat_id = json.dumps(update['message']['chat']['id'])
-    command = json.dumps(update['message']['text']).strip('"')
-    handle = json.dumps(update['message']['from']['username']).strip('"')
+    chat_id = update['message']['chat']['id']
+    command = update['message']['text']
+    handle = update['message']['from']['username']
     user_status = database.get_user_status(handle)
+
+    print(chat_id)
   
     if command == '/start':
         message.send_start(chat_id)
@@ -110,7 +112,7 @@ def handle_message(update):
 
 
 def handle_callback(update):
-    chat_id = json.dumps(update['callback_query']['message']['chat']['id'])
+    chat_id = update['callback_query']['message']['chat']['id']
     handle = update['callback_query']['from']['username']
     user_status = database.get_user_status(handle)
     data = update['callback_query']['data']
@@ -123,7 +125,7 @@ def handle_callback(update):
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
-            day, month, year = data.split(" ")
+            day, month, year = map(int, data.split(" "))
             date = datetime.date(year, month, day)
             database.update_booking_date(handle, date, user_status)
             message.send_set_booking_date(chat_id, date)
