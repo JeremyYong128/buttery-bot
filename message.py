@@ -5,7 +5,7 @@ from utils import format_booking_date
 HELP_MESSAGE = "- /book: get started with booking the buttery.\n- /bookings: view all approved bookings for the next 7 days.\n- /delete: delete your booking.\n- /help: view all commands.\n- /mybooking: view your current booking."
 PREVIOUS_BOOKING_MESSAGE = "You already have a previous booking. To add a new booking, cancel the previous one first."
 REQUEST_STRING = 'https://api.telegram.org/bot' + os.environ.get('TOKEN') + '/'
-ADMIN_CHAT_ID = "-4158095181"
+ADMIN_CHAT_ID = os.environ.get('ADMIN_CHAT_ID')
 
 def send(chat_id, text, markup=None):
     request_string = REQUEST_STRING + 'sendMessage?chat_id=' + chat_id + '&text=' + text
