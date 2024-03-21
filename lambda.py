@@ -113,7 +113,7 @@ def handle_private_message(update):
                     message.send(chat_id, "The duration of your booking has been set to " + (str(duration) if not duration.is_integer() else str(int(duration))) + " hours.")
                     booking = database.get_user_booking(handle)
                     message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
-                    message.send_to_admin(handle + " has made the following booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
+                    message.send_to_admin("@" + handle + " has made a booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
                 else:
                     message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
                 
