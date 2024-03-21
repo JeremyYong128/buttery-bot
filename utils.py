@@ -32,7 +32,7 @@ def admin_confirm_keyboard_markup(chat_id, handle, date: datetime.date, start_ti
     return json.dumps({
         "inline_keyboard": [[{
             "text": "Approve",
-            "callback_data": " ".join(["APPROVE", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.min), str(duration)])
+            "callback_data": " ".join(["APPROVE", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.minute), str(duration)])
         }]]
     })
 

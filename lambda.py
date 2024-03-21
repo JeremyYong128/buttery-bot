@@ -110,7 +110,7 @@ def handle_private_message(update):
                 end_time = Booking.calculate_end_time(booking.start_time, duration)
                 if Booking.is_valid_end_time(end_time):
                     database.update_booking_duration(handle, duration)
-                    message.send(chat_id, "The duration of your booking has been set to " + str(duration) + " hours.")
+                    message.send(chat_id, "The duration of your booking has been set to " + (str(duration) if not duration.is_integer() else str(int(duration))) + " hours.")
                     booking = database.get_user_booking(handle)
                     message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
                     message.send_to_admin(handle + " has made the following booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
@@ -147,19 +147,19 @@ def handle_callback(update):
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
-            day, month, year = map(int, data.split(" "))
+            day, month, year = map(int, data)
             date = datetime.date(year, month, day)
             database.update_booking_date(handle, date, user_status)
             message.send_set_booking_date(chat_id, date)
         return
     
     if command == "APPROVE":
-        chat_id, handle, year, month, day, hour, min, duration = data
-        date = datetime.date(year, month, day)
-        time = datetime.time(hour, min)
+        chat_id, handle, year, month, day, hour, minute, duration = data
+        date = datetime.date(int(year), int(month), int(day))
+        time = datetime.time(int(hour), int(minute))
         booking = database.get_user_booking(handle)
         
-        if booking == Booking(handle, date, time, duration, False):
+        if booking == Booking(handle, date, time, float(duration), False):
             database.approve_booking(handle)
             message.send_to_admin("@" + handle + "'s booking has been approved:\n\n" + str(booking))
             message.send(chat_id, "Your booking has been approved!\n\n" + str(booking))
