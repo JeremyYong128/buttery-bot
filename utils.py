@@ -20,11 +20,19 @@ def generate_keyboard_date_button(days):
         "callback_data": " ".join((day, month, year))
     }
 
-def yes_no_keyboard_markup():
+def confirm_keyboard_markup():
     return json.dumps({
         "inline_keyboard": [[{
             "text": "Confirm",
             "callback_data": "Confirm"
+        }]]
+    })
+
+def admin_confirm_keyboard_markup(handle, date: datetime.date, start_time: datetime.time, duration):
+    return json.dumps({
+        "inline_keyboard": [[{
+            "text": "Confirm",
+            "callback_data": " ".join([handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.min), str(duration)])
         }]]
     })
 

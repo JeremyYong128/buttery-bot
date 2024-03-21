@@ -29,5 +29,5 @@ def send_set_booking_date(chat_id, date):
 def send_set_booking_time(chat_id, hour, min):
     send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + str(min) + ".")
 
-def send_to_admin(text):
-    send(ADMIN_CHAT_ID, text)
+def send_to_admin(text, markup=None):
+    send(ADMIN_CHAT_ID, text, markup)

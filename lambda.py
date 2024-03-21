@@ -8,13 +8,14 @@ from models.Booking import Booking
 
 def handler(event, context):
     update = json.loads(event['body'])
+    print(update)
     database.update()
 
     if 'message' in update:
-        if update['chat']['type'] == 'private':
+        if update['message']['chat']['type'] == 'private':
             handle_private_message(update)
 
-        if update['chat']['type'] == 'group':
+        if update['message']['chat']['type'] == 'group':
             handle_group_message(update)
 
     if 'callback_query' in update:
@@ -29,9 +30,6 @@ def handle_private_message(update):
     command = update['message']['text'] if 'text' in update['message'] else None
     handle = update['message']['from']['username']
     user_status = database.get_user_status(handle)
-
-    print(chat_id)
-    print(handle)
   
     if command == '/start':
         message.send_start(chat_id)
@@ -67,11 +65,11 @@ def handle_private_message(update):
         if booking is None:
             message.send(chat_id, "You have no bookings. To create a booking, use /book.")
         elif booking.get_status() == "approved":
-            message.send(chat_id, "You have one approved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one approved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.confirm_keyboard_markup())
         elif booking.get_status() == "unapproved":
-            message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.confirm_keyboard_markup())
         else:
-            message.send(chat_id, "You have one booking in progress:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.yes_no_keyboard_markup())
+            message.send(chat_id, "You have one booking in progress:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.confirm_keyboard_markup())
 
     elif command == '/book':
         if user_status == "approved" or user_status == "unapproved":
@@ -114,7 +112,8 @@ def handle_private_message(update):
                     database.update_booking_duration(handle, duration)
                     message.send(chat_id, "The duration of your booking has been set to " + str(duration) + " hours.")
                     booking = database.get_user_booking(handle)
-                    message.send(chat_id, "Your booking has been made!\n\n" + str(booking))
+                    message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
+                    message.send_to_admin(handle + " has made the following booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(handle, booking.date, booking.start_time, booking.duration))
                 else:
                     message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
                 
