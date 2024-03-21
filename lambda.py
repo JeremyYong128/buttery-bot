@@ -125,6 +125,10 @@ def handle_private_message(update):
 
 def handle_group_message(update):
     chat_id = str(update['message']['chat']['id'])
+
+    if chat_id != message.ADMIN_CHAT_ID:
+        return
+    
     command = update['message']['text'] if 'text' in update['message'] else None
     
     message.send_to_admin("Group message received")
