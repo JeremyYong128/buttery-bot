@@ -30,10 +30,14 @@ def confirm_keyboard_markup():
 
 def admin_confirm_keyboard_markup(chat_id, handle, date: datetime.date, start_time: datetime.time, duration):
     return json.dumps({
-        "inline_keyboard": [[{
-            "text": "Approve",
-            "callback_data": " ".join(["APPROVE", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.minute), str(duration)])
-        }]]
+        "inline_keyboard": [
+            [{
+                "text": "Approve",
+                "callback_data": " ".join(["APPROVE", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.minute), str(duration)])
+            }], [{
+                "text": "Reject",
+                "callback_data": " ".join(["REJECT", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.minute), str(duration)])
+            }]]
     })
 
 def format_booking_date(date):

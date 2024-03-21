@@ -157,16 +157,23 @@ def handle_callback(update):
             message.send_set_booking_date(chat_id, date)
         return
     
-    if command == "APPROVE":
+    if command == "APPROVE" or command == "REJECT":
         chat_id, handle, year, month, day, hour, minute, duration = data
         date = datetime.date(int(year), int(month), int(day))
         time = datetime.time(int(hour), int(minute))
         booking = database.get_user_booking(handle)
         
-        if booking == Booking(handle, date, time, float(duration), False):
+        if booking != Booking(handle, date, time, float(duration), False):
+            message.send_to_admin("Booking is no longer valid.")
+            return
+        
+        if command == "APPROVE":
             database.approve_booking(handle)
             message.send_to_admin("@" + handle + "'s booking has been approved:\n\n" + str(booking))
             message.send(chat_id, "Your booking has been approved!\n\n" + str(booking))
-        else:
-            message.send_to_admin("Booking is no longer valid.")
-        return
+            return
+        
+        if command == "REJECT":
+            database.delete_booking(handle)
+            message.send_to_admin("@" + handle + "'s booking has been rejected:\n\n" + str(booking))
+            message.send(chat_id, "Your booking has been rejected.\n\n" + str(booking))
