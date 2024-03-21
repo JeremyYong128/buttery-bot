@@ -106,3 +106,9 @@ def delete_booking(telegram_handle):
     with conn.cursor() as cursor:
         cursor.execute("delete from bookings where telegram_handle = '" + telegram_handle + "'")
     release_connection(conn)
+
+def approve_booking(telegram_handle):
+    conn = get_connection()
+    with conn.cursor() as cursor:
+        cursor.execute("update bookings set approved = true where telegram_handle = '" + telegram_handle + "'")
+    release_connection(conn)

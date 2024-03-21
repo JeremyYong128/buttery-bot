@@ -17,22 +17,22 @@ def generate_keyboard_date_button(days):
     
     return {
         "text": date_string,
-        "callback_data": " ".join((day, month, year))
+        "callback_data": " ".join(["BOOK", day, month, year])
     }
 
 def confirm_keyboard_markup():
     return json.dumps({
         "inline_keyboard": [[{
             "text": "Confirm",
-            "callback_data": "Confirm"
+            "callback_data": "CONFIRM"
         }]]
     })
 
-def admin_confirm_keyboard_markup(handle, date: datetime.date, start_time: datetime.time, duration):
+def admin_confirm_keyboard_markup(chat_id, handle, date: datetime.date, start_time: datetime.time, duration):
     return json.dumps({
         "inline_keyboard": [[{
-            "text": "Confirm",
-            "callback_data": " ".join([handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.min), str(duration)])
+            "text": "Approve",
+            "callback_data": " ".join(["APPROVE", chat_id, handle, str(date.year), str(date.month), str(date.day), str(start_time.hour), str(start_time.min), str(duration)])
         }]]
     })
 

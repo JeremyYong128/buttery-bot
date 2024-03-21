@@ -46,6 +46,11 @@ class Booking:
 
         return date_str + ": " + start_time_str + end_time_str
     
+    def __eq__(self, other):
+        if isinstance(other, Booking):
+            return self.telegram_handle == other.telegram_handle and self.date == other.date and self.start_time == other.start_time and self.duration == other.duration and self.approved == other.approved
+        return False
+    
     def get_status(self):
         if self.approved:
             return "approved"

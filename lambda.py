@@ -113,7 +113,7 @@ def handle_private_message(update):
                     message.send(chat_id, "The duration of your booking has been set to " + str(duration) + " hours.")
                     booking = database.get_user_booking(handle)
                     message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
-                    message.send_to_admin(handle + " has made the following booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(handle, booking.date, booking.start_time, booking.duration))
+                    message.send_to_admin(handle + " has made the following booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
                 else:
                     message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
                 
@@ -134,13 +134,16 @@ def handle_callback(update):
     chat_id = str(update['callback_query']['message']['chat']['id'])
     handle = update['callback_query']['from']['username']
     user_status = database.get_user_status(handle)
-    data = update['callback_query']['data']
+    callback_data = update['callback_query']['data'].split(" ")
+    command = callback_data[0]
+    data = callback_data[1:] if len(callback_data) > 1 else None
 
-    if data == "Confirm":
+    if command == "CONFIRM":
         database.delete_booking(handle)
         message.send(chat_id, "Your booking has been deleted.")
-
-    else:
+        return
+    
+    if command == "BOOK":
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         else:
@@ -148,3 +151,18 @@ def handle_callback(update):
             date = datetime.date(year, month, day)
             database.update_booking_date(handle, date, user_status)
             message.send_set_booking_date(chat_id, date)
+        return
+    
+    if command == "APPROVE":
+        chat_id, handle, year, month, day, hour, min, duration = data
+        date = datetime.date(year, month, day)
+        time = datetime.time(hour, min)
+        booking = database.get_user_booking(handle)
+        
+        if booking == Booking(handle, date, time, duration, False):
+            database.approve_booking(handle)
+            message.send_to_admin("@" + handle + "'s booking has been approved:\n\n" + str(booking))
+            message.send(chat_id, "Your booking has been approved!\n\n" + str(booking))
+        else:
+            message.send_to_admin("Booking is no longer valid.")
+        return
