@@ -11,7 +11,11 @@ def handler(event, context):
     database.update()
 
     if 'message' in update:
-        handle_message(update)
+        if update['chat']['type'] == 'private':
+            handle_private_message(update)
+
+        if update['chat']['type'] == 'group':
+            handle_group_message(update)
 
     if 'callback_query' in update:
         handle_callback(update)
@@ -20,9 +24,9 @@ def handler(event, context):
         'statusCode': 200
     }
 
-def handle_message(update):
+def handle_private_message(update):
     chat_id = str(update['message']['chat']['id'])
-    command = update['message']['text']
+    command = update['message']['text'] if 'text' in update['message'] else None
     handle = update['message']['from']['username']
     user_status = database.get_user_status(handle)
 
@@ -88,10 +92,11 @@ def handle_message(update):
             message.send(chat_id, "Invalid time provided. The start time of bookings has to be from 8am to 11:30pm (0800 - 2330).")
             return
         
-        booking_date = database.get_booking_date(handle)
+        booking_date = database.get_booking_date(handle)[0]
 
         if not Booking.is_more_than_24h(booking_date, hour, min):
             message.send(chat_id, "Invalid time provided. Bookings have to be made at least 24h in advance.")
+            return
         
         database.update_booking_time(handle, hour, min)
         message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + (str(min) if min else "00") + ".\n\n" +
@@ -118,6 +123,12 @@ def handle_message(update):
     
     else:
         message.send_unknown_command(chat_id)
+
+def handle_group_message(update):
+    chat_id = str(update['message']['chat']['id'])
+    command = update['message']['text'] if 'text' in update['message'] else None
+    
+    message.send_to_admin("Group message received")
 
 
 def handle_callback(update):

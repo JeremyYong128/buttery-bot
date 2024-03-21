@@ -2,15 +2,10 @@ import os
 import requests
 from utils import format_booking_date
 
-HELP_MESSAGE = """
-    - /book: get started with booking the buttery.\n
-    - /bookings: view all approved bookings for the next 7 days.\n
-    - /delete: delete your booking.\n
-    - /help: view all commands.\n
-    - /mybooking: view your current booking.\n
-    """
+HELP_MESSAGE = "- /book: get started with booking the buttery.\n- /bookings: view all approved bookings for the next 7 days.\n- /delete: delete your booking.\n- /help: view all commands.\n- /mybooking: view your current booking."
 PREVIOUS_BOOKING_MESSAGE = "You already have a previous booking. To add a new booking, cancel the previous one first."
 REQUEST_STRING = 'https://api.telegram.org/bot' + os.environ.get('TOKEN') + '/'
+ADMIN_CHAT_ID = "-4158095181"
 
 def send(chat_id, text, markup=None):
     request_string = REQUEST_STRING + 'sendMessage?chat_id=' + chat_id + '&text=' + text
@@ -33,3 +28,6 @@ def send_set_booking_date(chat_id, date):
     
 def send_set_booking_time(chat_id, hour, min):
     send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + str(min) + ".")
+
+def send_to_admin(text):
+    send(ADMIN_CHAT_ID, text)
