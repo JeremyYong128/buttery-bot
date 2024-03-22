@@ -3,8 +3,6 @@ import datetime
 class Booking:
     time_format_string = "%-I:%M %p"
     date_format_string = "%a, %-d %b"
-    max_duration = 2
-    acceptable_durations = [0.5 * i for i in range(1, int(max_duration / 0.5) + 1)]
     open_time = datetime.time(8, 0)
     close_time = datetime.time(0, 0)
     
@@ -23,7 +21,7 @@ class Booking:
     
     @staticmethod
     def is_valid_end_time(time):
-        if Booking.open_time < time or time == Booking.close_time:
+        if Booking.open_time < time or time <= Booking.close_time:
             return True
         return False
 

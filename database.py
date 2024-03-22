@@ -3,7 +3,6 @@ import urllib.parse as up
 from psycopg2 import pool
 from models.Booking import Booking
 from datetime import date
-from psycopg2.errors import UniqueViolation
 
 connection_pool = None
 

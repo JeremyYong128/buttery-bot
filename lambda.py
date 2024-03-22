@@ -32,12 +32,14 @@ def handle_private_message(update):
     user_status = database.get_user_status(handle)
   
     if command == '/start':
-        message.send_start(chat_id)
+        message.send(chat_id, "Welcome to Saga Buttery Bot!\n\n" + message.COMMAND_LIST)
+        return
         
-    elif command == '/help':
-        message.send_help(chat_id)
+    if command == '/help':
+        message.send(chat_id, message.COMMAND_LIST + "\n\n" + message.GUIDELINES + "\n\nFor more assistance, contact @carinateh, @jemmacheah, @jeremyyong128, @owenyeoo, or @ymirmeddeb.")
+        return
     
-    elif command == '/bookings':
+    if command == '/bookings':
         bookings = database.get_approved_bookings()
         
         if len(bookings) == 0:
@@ -46,8 +48,9 @@ def handle_private_message(update):
             initial_str = "Here are all the current bookings:\n\n"
             final_str = reduce(lambda acc, next: acc + "\n" + str(next), bookings, initial_str)
             message.send(chat_id, final_str)
+        return
     
-    elif command == '/mybooking':
+    if command == '/mybooking':
         booking = database.get_user_booking(handle)
 
         if booking is None:
@@ -58,8 +61,9 @@ def handle_private_message(update):
             message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking))
         else:
             message.send(chat_id, "You have one booking in progress:\n\n" + str(booking))
+        return
 
-    elif command == '/delete':
+    if command == '/delete':
         booking = database.get_user_booking(handle)
 
         if booking is None:
@@ -70,16 +74,18 @@ def handle_private_message(update):
             message.send(chat_id, "You have one unapproved booking:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.confirm_keyboard_markup())
         else:
             message.send(chat_id, "You have one booking in progress:\n\n" + str(booking) + "\n\nPress confirm to delete this booking.", utils.confirm_keyboard_markup())
+        return
 
-    elif command == '/book':
+    if command == '/book':
         if user_status == "approved" or user_status == "unapproved":
             message.send(chat_id, message.PREVIOUS_BOOKING_MESSAGE)
         
         else:
             keyboard_markup = utils.generate_dates_keyboard_markup()
             message.send(chat_id, "Choose the day of your booking:", keyboard_markup)
+        return
 
-    elif user_status == "setting time":
+    if user_status == "setting time":
         if not utils.is_valid_time_format(command):
             message.send(chat_id, "Invalid time format. Make sure it follows the 24h format and is on the hour/half hour (e.g. 23:00, 1430).")
             return
@@ -99,29 +105,40 @@ def handle_private_message(update):
         database.update_booking_time(handle, hour, min)
         message.send(chat_id, "The time of your booking has been set to " + str(hour) + ":" + (str(min) if min else "00") + ".\n\n" +
                      "Enter the duration of your booking. Note that bookings can be a maximum of 2h long, and must be in intervals of 0.5h.")
+        return
 
-    elif user_status == "setting duration":
+    if user_status == "setting duration":
+        duration = None
+    
         try:
             duration = float(command)
-            if duration not in Booking.acceptable_durations:
-                message.send(chat_id, "Invalid duration provided. Duration must be a minimum of 0.5h and a maximum of 2h, and in intervals of 0.5h (i.e. values like 0.75 will not be accepted)")
-            else:
-                booking = database.get_user_booking(handle)
-                end_time = Booking.calculate_end_time(booking.start_time, duration)
-                if Booking.is_valid_end_time(end_time):
-                    database.update_booking_duration(handle, duration)
-                    message.send(chat_id, "The duration of your booking has been set to " + (str(duration) if not duration.is_integer() else str(int(duration))) + " hours.")
-                    booking = database.get_user_booking(handle)
-                    message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
-                    message.send_to_admin("@" + handle + " has made a booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
-                else:
-                    message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
-                
         except ValueError:
             message.send(chat_id, "Invalid duration format. Make sure it is a valid duration (e.g. 0.5, 1).")
-    
-    else:
-        message.send_unknown_command(chat_id)
+            return
+        
+        if duration % 0.5 != 0:
+            message.send(chat_id, "Invalid duration provided. Duration must be in intervals of 0.5h (i.e. values like 0.75 will not be accepted).")
+            return
+        
+        if duration >= 24:
+            message.send(chat_id, "Duration is too long.")
+            return
+        
+        booking = database.get_user_booking(handle)
+        end_time = Booking.calculate_end_time(booking.start_time, duration)
+
+        if not Booking.is_valid_end_time(end_time):
+            message.send(chat_id, "Invalid duration provided. Bookings must end by 12am.")
+            return
+
+        database.update_booking_duration(handle, duration)
+        message.send(chat_id, "The duration of your booking has been set to " + (str(duration) if not duration.is_integer() else str(int(duration))) + " hours.")
+        booking = database.get_user_booking(handle)
+        message.send(chat_id, "Your booking has been made!\n\n" + str(booking) + "\n\nYou will get a message when your booking has been approved by one of our buttery ICs.")
+        message.send_to_admin("@" + handle + " has made a booking:\n\n" + str(booking), utils.admin_confirm_keyboard_markup(chat_id, handle, booking.date, booking.start_time, booking.duration))
+        return
+     
+    message.send(chat_id, "Unknown command. Type /help for a list of commands.")
 
 def handle_group_message(update):
     chat_id = str(update['message']['chat']['id'])
@@ -154,7 +171,8 @@ def handle_callback(update):
             day, month, year = map(int, data)
             date = datetime.date(year, month, day)
             database.update_booking_date(handle, date, user_status)
-            message.send_set_booking_date(chat_id, date)
+            message.send(chat_id, "The date of your booking has been set to " + utils.format_booking_date(date) + ".\n\n" +
+                         "Enter the time of your booking in 24h format (HH:MM or HHMM). Note that bookings can only be made on the hour or half hour.")
         return
     
     if command == "APPROVE" or command == "REJECT":
@@ -177,3 +195,4 @@ def handle_callback(update):
             database.delete_booking(handle)
             message.send_to_admin("@" + handle + "'s booking has been rejected:\n\n" + str(booking))
             message.send(chat_id, "Your booking has been rejected.\n\n" + str(booking))
+            return
